@@ -11,6 +11,9 @@ const createRect = (x, y, width, heigth, color) => {
 const fps = 30;
 const oneBlockSize = 20;
 const wallColor = "#342DCa";
+const wallSpaceWidth = oneBlockSize / 1.5;
+const wallOffset = (oneBlockSize - wallSpaceWidth) / 2;
+const innerColor = "black";
 
 const map = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -64,6 +67,42 @@ const drawWalls = () => {
           oneBlockSize,
           oneBlockSize,
           wallColor
+        );
+      }
+      if (j > 0 && map[i][j - 1] === 1) {
+        createRect(
+          j * oneBlockSize,
+          i * oneBlockSize + wallOffset,
+          wallSpaceWidth + wallOffset,
+          wallSpaceWidth,
+          innerColor
+        );
+      }
+      if (j < map[0].length - 1 && map[i][j + 1] === 1) {
+        createRect(
+          j * oneBlockSize + wallOffset,
+          i * oneBlockSize + wallOffset,
+          wallSpaceWidth + wallOffset,
+          wallSpaceWidth,
+          innerColor
+        );
+      }
+      if (i > 0 && map[i - 1][j] === 1) {
+        createRect(
+          j * oneBlockSize + wallOffset,
+          i * oneBlockSize,
+          wallSpaceWidth,
+          wallSpaceWidth + wallOffset,
+          innerColor
+        );
+      }
+      if (i < map.length - 1 && map[i + 1][j] === 1) {
+        createRect(
+          j * oneBlockSize + wallOffset,
+          i * oneBlockSize + wallOffset,
+          wallSpaceWidth,
+          wallSpaceWidth + wallOffset,
+          innerColor
         );
       }
     }
