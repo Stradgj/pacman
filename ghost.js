@@ -1,0 +1,169 @@
+class Pacman {
+  constructor(
+    x,
+    y,
+    width,
+    height,
+    speed,
+    imageX,
+    imageY,
+    imageWidth,
+    imageHeight,
+    range
+  ) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.speed = speed;
+    this.direction = DIRECTION_RIGHT;
+    this.nextDirection = this.direction;
+    this.frameCount = 7;
+    this.currentFrame = 1;
+    this.imageWidth = imageWidth;
+    this.imageHeight = imageHeight;
+
+    setInterval(() => {
+      this.changeAnimation();
+    }, 100);
+  }
+
+  moveProcess() {
+    this.changeDirection();
+    this.moveForvards();
+    if (this.checkCollision()) {
+      this.moveBackwards();
+      return;
+    }
+  }
+  eat() {}
+  moveBackwards() {
+    switch (this.direction) {
+      case DIRECTION_RIGHT: // Right
+        this.x -= this.speed;
+        break;
+      case DIRECTION_UP: // Up
+        this.y += this.speed;
+        break;
+      case DIRECTION_LEFT: // Left
+        this.x += this.speed;
+        break;
+      case DIRECTION_BOTTOM: // Bottom
+        this.y -= this.speed;
+        break;
+    }
+  }
+  moveForvards() {
+    switch (this.direction) {
+      case DIRECTION_RIGHT: // Right
+        this.x += this.speed;
+        break;
+      case DIRECTION_UP: // Up
+        this.y -= this.speed;
+        break;
+      case DIRECTION_LEFT: // Left
+        this.x -= this.speed;
+        break;
+      case DIRECTION_BOTTOM: // Bottom
+        this.y += this.speed;
+        break;
+    }
+  }
+  checkCollision() {
+    let isCollisded = false;
+    if (
+      map[parseInt(this.y / oneBlockSize)][parseInt(this.x / oneBlockSize)] ===
+        1 ||
+      map[parseInt(this.y / oneBlockSize + 0.9999)][
+        parseInt(this.x / oneBlockSize)
+      ] === 1 ||
+      map[parseInt(this.y / oneBlockSize)][
+        parseInt(this.x / oneBlockSize + 0.9999)
+      ] === 1 ||
+      map[parseInt(this.y / oneBlockSize + 0.9999)][
+        parseInt(this.x / oneBlockSize + 0.9999)
+      ] === 1
+    ) {
+      isCollisded = true;
+    }
+    return isCollisded;
+  }
+  getMapX() {
+    let mapX = parseInt(this.x / oneBlockSize);
+    return mapX;
+  }
+
+  getMapY() {
+    let mapY = parseInt(this.y / oneBlockSize);
+
+    return mapY;
+  }
+
+  getMapXRightSide() {
+    let mapX = parseInt((this.x * 0.99 + oneBlockSize) / oneBlockSize);
+    return mapX;
+  }
+
+  getMapYRightSide() {
+    let mapY = parseInt((this.y * 0.99 + oneBlockSize) / oneBlockSize);
+    return mapY;
+  }
+  checkGhostCollision() {}
+  changeDirection() {
+    if (this.direction === this.nextDirection) return;
+
+    let tempDirection = this.direction;
+    this.direction = this.nextDirection;
+    this.moveForvards;
+    if (this.checkCollision()) {
+      this.moveBackwards();
+      this.direction = tempDirection;
+    } else {
+      this.moveBackwards();
+    }
+  }
+
+  changeAnimation() {
+    this.currentFrame =
+      this.currentFrame === this.frameCount ? 1 : this.currentFrame + 1;
+  }
+  draw() {
+    canvasContext.save();
+    canvasContext.translate(
+      this.x + oneBlockSize / 2,
+      this.y + oneBlockSize / 2
+    );
+
+    canvasContext.rotate((this.direction * 90 * Math.PI) / 180);
+
+    canvasContext.translate(
+      -this.x - oneBlockSize / 2,
+      -this.y - oneBlockSize / 2
+    );
+
+    canvasContext.drawImage(
+      pacmanFrames,
+      (this.currentFrame - 1) * oneBlockSize,
+      0,
+      oneBlockSize,
+      oneBlockSize,
+      this.x,
+      this.y,
+      this.width,
+      this.height
+    );
+
+    canvasContext.restore();
+  }
+
+  eat() {
+    for (let i = 0; i < map.length; i++) {
+      for (let j = 0; j < map[0].length; j++) {
+        if (map[i][j] === 2 && this.getMapX() === j && this.getMapY() === i) {
+          map[i][j] = 3;
+          score++;
+        }
+      }
+    }
+  }
+}
