@@ -38,7 +38,7 @@ class Ghost {
   calcNewDirection(map, destX, destY) {
     const mp = [];
     for (let i = 0; i < map.length; i++) {
-      mp[i] = map[i].slice;
+      mp[i] = map[i].slice();
     }
     const queue = [
       {
@@ -54,18 +54,68 @@ class Ghost {
       } else {
         mp[poped.y][poped.x] = 1;
         const neighborList = this.addNeighbors(poped, mp);
+        for (let i = 0; i < neighborList.length; i++) {
+          queue.push(neighborList[i]);
+        }
       }
     }
+
+    return DIRECTION_UP;
+  }
+
+  addNeighbors(poped, mp) {
+    const queue = [];
+    const numOfRows = mp.length;
+    const numOfColumns = mp[0].length;
+
+    if (
+      poped.x - 1 >= 0 &&
+      poped.x - 1 < numOfRows &&
+      mp[poped.y][poped.x - 1] !== 1
+    ) {
+      const tempMoves = poped.moves.slice();
+      tempMoves.push(DIRECTION_LEFT);
+      queue.push({ x: poped.x - 1, y: poped.y, moves: tempMoves });
+    }
+    if (
+      poped.x + 1 >= 0 &&
+      poped.x + 1 < numOfRows &&
+      mp[poped.y][poped.x + 1] !== 1
+    ) {
+      const tempMoves = poped.moves.slice();
+      tempMoves.push(DIRECTION_RIGHT);
+      queue.push({ x: poped.x + 1, y: poped.y, moves: tempMoves });
+    }
+    if (
+      poped.y - 1 >= 0 &&
+      poped.y - 1 < numOfColumns &&
+      mp[poped.y - 1][poped.x] !== 1
+    ) {
+      const tempMoves = poped.moves.slice();
+      tempMoves.push(DIRECTION_UP);
+      queue.push({ x: poped.x, y: poped.y - 1, moves: tempMoves });
+    }
+    if (
+      poped.y + 1 >= 0 &&
+      poped.y + 1 < numOfColumns &&
+      mp[poped.y + 1][poped.x] !== 1
+    ) {
+      const tempMoves = poped.moves.slice();
+      tempMoves.push(DIRECTION_BOTTOM);
+      queue.push({ x: poped.x, y: poped.y + 1, moves: tempMoves });
+    }
+
+    return queue;
   }
 
   moveProcess() {
     if (this.isInRangeOfPacman()) {
-      target = pacman;
+      this.target = pacman;
     } else {
-      target = randomTargets[randomTargetIndex];
+      this.target = randomTargets[this.randomTargetIndex];
     }
     this.changeDirection();
-    this.moveForvards();
+    this.moveForwards();
     if (this.checkCollision()) {
       this.moveBackwards();
       return;
@@ -88,7 +138,7 @@ class Ghost {
         break;
     }
   }
-  moveForvards() {
+  moveForwards() {
     switch (this.direction) {
       case DIRECTION_RIGHT: // Right
         this.x += this.speed;
@@ -161,14 +211,18 @@ class Ghost {
     this.direction = this.calcNewDirection(
       map,
       parseInt(this.target.x / oneBlockSize),
-      map,
       parseInt(this.target.y / oneBlockSize)
     );
 
-    this.moveForvards;
+    if (typeof this.direction == "undefined") {
+      this.direction = this.tempDirection;
+      return;
+    }
+
+    this.moveForwards();
     if (this.checkCollision()) {
       this.moveBackwards();
-      this.direction = tempDirection;
+      this.direction = this.tempDirection;
     } else {
       this.moveBackwards();
     }
@@ -194,16 +248,5 @@ class Ghost {
     );
 
     canvasContext.restore();
-  }
-
-  eat() {
-    for (let i = 0; i < map.length; i++) {
-      for (let j = 0; j < map[0].length; j++) {
-        if (map[i][j] === 2 && this.getMapX() === j && this.getMapY() === i) {
-          map[i][j] = 3;
-          score++;
-        }
-      }
-    }
   }
 }

@@ -31,13 +31,6 @@ const ghostLocations = [
   { x: 176, y: 121 },
 ];
 
-const randomTargets = [
-  { x: oneBlockSize, y: oneBlockSize },
-  { x: oneBlockSize, y: (map.length - 2) * oneBlockSize },
-  { x: (map[0].length - 2) * oneBlockSize, y: oneBlockSize },
-  { x: (map[0].length - 2) * oneBlockSize, y: (map.length - 2) * oneBlockSize },
-];
-
 const map = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
@@ -63,6 +56,12 @@ const map = [
   [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
+const randomTargets = [
+  { x: oneBlockSize, y: oneBlockSize },
+  { x: oneBlockSize, y: (map.length - 2) * oneBlockSize },
+  { x: (map[0].length - 2) * oneBlockSize, y: oneBlockSize },
+  { x: (map[0].length - 2) * oneBlockSize, y: (map.length - 2) * oneBlockSize },
+];
 
 const gameLoop = () => {
   update();
@@ -73,6 +72,9 @@ const update = () => {
   // todo
   pacman.moveProcess();
   pacman.eat();
+  for (let i = 0; i < ghosts.length; i++) {
+    ghosts[i].moveProcess();
+  }
 };
 
 const drawScore = function () {
