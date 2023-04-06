@@ -1,4 +1,4 @@
-class Pacman {
+class Ghost {
   constructor(
     x,
     y,
@@ -18,17 +18,52 @@ class Pacman {
     this.speed = speed;
     this.direction = DIRECTION_RIGHT;
     this.nextDirection = this.direction;
-    this.frameCount = 7;
-    this.currentFrame = 1;
+    this.imageX = imageX;
+    this.imageY = imageY;
     this.imageWidth = imageWidth;
     this.imageHeight = imageHeight;
+    this.range = range;
+    this.randomTargetIndex = parseInt(Math.random() * randomTargets.length);
 
     setInterval(() => {
-      this.changeAnimation();
-    }, 100);
+      this.changeRandomDirection();
+    }, 10000);
+  }
+
+  changeRandomDirection() {
+    this.randomTargetIndex += 1;
+    this.randomTargetIndex = this.randomTargetIndex % 4;
+  }
+
+  calcNewDirection(map, destX, destY) {
+    const mp = [];
+    for (let i = 0; i < map.length; i++) {
+      mp[i] = map[i].slice;
+    }
+    const queue = [
+      {
+        x: this.getMapX(),
+        y: this.getMapY(),
+        moves: [],
+      },
+    ];
+    while (queue.length > 0) {
+      const poped = queue.shift();
+      if (poped.x === destX && poped.y === destY) {
+        return poped.moves[0];
+      } else {
+        mp[poped.y][poped.x] = 1;
+        const neighborList = this.addNeighbors(poped, mp);
+      }
+    }
   }
 
   moveProcess() {
+    if (this.isInRangeOfPacman()) {
+      target = pacman;
+    } else {
+      target = randomTargets[randomTargetIndex];
+    }
     this.changeDirection();
     this.moveForvards();
     if (this.checkCollision()) {
@@ -36,7 +71,7 @@ class Pacman {
       return;
     }
   }
-  eat() {}
+
   moveBackwards() {
     switch (this.direction) {
       case DIRECTION_RIGHT: // Right
@@ -109,11 +144,27 @@ class Pacman {
     return mapY;
   }
   checkGhostCollision() {}
-  changeDirection() {
-    if (this.direction === this.nextDirection) return;
 
-    let tempDirection = this.direction;
-    this.direction = this.nextDirection;
+  isInRangeOfPacman() {
+    const xDistance = Math.abs(pacman.getMapX() - this.getMapX());
+    const yDistance = Math.abs(pacman.getMapY() - this.getMapY());
+    if (
+      Math.sqrt(xDistance * xDistance + yDistance * yDistance) <= this.range
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  changeDirection() {
+    this.tempDirection = this.direction;
+    this.direction = this.calcNewDirection(
+      map,
+      parseInt(this.target.x / oneBlockSize),
+      map,
+      parseInt(this.target.y / oneBlockSize)
+    );
+
     this.moveForvards;
     if (this.checkCollision()) {
       this.moveBackwards();
@@ -129,24 +180,13 @@ class Pacman {
   }
   draw() {
     canvasContext.save();
-    canvasContext.translate(
-      this.x + oneBlockSize / 2,
-      this.y + oneBlockSize / 2
-    );
-
-    canvasContext.rotate((this.direction * 90 * Math.PI) / 180);
-
-    canvasContext.translate(
-      -this.x - oneBlockSize / 2,
-      -this.y - oneBlockSize / 2
-    );
 
     canvasContext.drawImage(
-      pacmanFrames,
-      (this.currentFrame - 1) * oneBlockSize,
-      0,
-      oneBlockSize,
-      oneBlockSize,
+      ghostsFrames,
+      this.imageX,
+      this.imageY,
+      this.imageWidth,
+      this.imageHeight,
       this.x,
       this.y,
       this.width,
