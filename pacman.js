@@ -104,7 +104,19 @@ class Pacman {
     let mapY = parseInt((this.y * 0.99 + oneBlockSize) / oneBlockSize);
     return mapY;
   }
-  checkGhostCollision() {}
+  checkGhostCollision() {
+    for (let i = 0; i < ghosts.length; i++) {
+      const ghost = ghosts[i];
+      if (
+        ghost.getMapX() === this.getMapX() &&
+        ghost.getMapY() === this.getMapY()
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   changeDirection() {
     if (this.direction === this.nextDirection) return;
 

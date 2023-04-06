@@ -11,6 +11,8 @@ const createRect = (x, y, width, heigth, color) => {
 let pacman;
 let ghosts;
 let score = 0;
+let lives = 3;
+let foodCount = 0;
 const fps = 30;
 const oneBlockSize = 20;
 const wallColor = "#342DCa";
@@ -56,6 +58,14 @@ const map = [
   [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
+
+for (let i = 0; i < map.length; i++) {
+  for (let j = 0; j < map[0].length; j++) {
+    if (map[i][j] === 2) {
+      foodCount++;
+    }
+  }
+}
 const randomTargets = [
   { x: oneBlockSize, y: oneBlockSize },
   { x: oneBlockSize, y: (map.length - 2) * oneBlockSize },
@@ -64,8 +74,8 @@ const randomTargets = [
 ];
 
 const gameLoop = () => {
-  update();
   draw();
+  update();
 };
 
 const update = () => {
@@ -75,8 +85,60 @@ const update = () => {
   for (let i = 0; i < ghosts.length; i++) {
     ghosts[i].moveProcess();
   }
+
+  if (pacman.checkGhostCollision()) {
+    restartGame();
+  }
+  if (score >= foodCount) {
+    drawGameWin();
+    clearInterval(gameInterval);
+  }
 };
 
+const restartGame = () => {
+  createNewPacman();
+  createGhosts();
+  lives--;
+  if (lives === 0) {
+    gameOver();
+  }
+};
+
+const gameOver = () => {
+  clearInterval(gameInterval);
+  drawGameOver();
+};
+
+const drawGameOver = () => {
+  canvasContext.font = "20px Emulogic";
+  canvasContext.fillStyle = "white";
+  canvasContext.fillText("Game over!", 150, 200);
+};
+const drawGameWin = () => {
+  canvasContext.font = "20px Emulogic";
+  canvasContext.fillStyle = "white";
+  canvasContext.fillText("You win!", 150, 200);
+};
+
+const drawLives = () => {
+  canvasContext.font = "20px Emulogic";
+  canvasContext.fillStyle = "white";
+  canvasContext.fillText(`Lives: `, 220, oneBlockSize * (map.length + 1));
+
+  for (let i = 0; i < lives; i++) {
+    canvasContext.drawImage(
+      pacmanFrames,
+      2 * oneBlockSize,
+      0,
+      oneBlockSize,
+      oneBlockSize,
+      350 + i * oneBlockSize,
+      oneBlockSize * map.length + 1,
+      oneBlockSize,
+      oneBlockSize
+    );
+  }
+};
 const drawScore = function () {
   canvasContext.font = "20px emulogic";
   canvasContext.fillStyle = "white";
@@ -96,6 +158,7 @@ const draw = () => {
   pacman.draw();
   drawScore();
   drawGhosts();
+  drawLives();
 };
 
 const drawFoods = function () {

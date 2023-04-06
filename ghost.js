@@ -193,8 +193,6 @@ class Ghost {
     let mapY = parseInt((this.y * 0.99 + oneBlockSize) / oneBlockSize);
     return mapY;
   }
-  checkGhostCollision() {}
-
   isInRangeOfPacman() {
     const xDistance = Math.abs(pacman.getMapX() - this.getMapX());
     const yDistance = Math.abs(pacman.getMapY() - this.getMapY());
